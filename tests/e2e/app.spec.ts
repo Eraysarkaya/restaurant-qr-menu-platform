@@ -11,8 +11,7 @@ async function login(page: Page) {
     await page.getByLabel("E-posta").fill(adminEmail);
     await page.getByLabel("Parola").fill(adminPassword);
     await page.getByRole("button", { name: "Güvenli giriş yap" }).click();
-    await page.waitForURL(/\/admin/);
-    await page.goto("/admin");
+    await page.waitForURL(/\/admin\/?$/);
   }
   await expect(page.getByRole("heading", { name: "Köşe Mutfak" })).toBeVisible();
   authenticatedCookies = await page.context().cookies();
@@ -85,7 +84,7 @@ test("admin ürün CRUD ve public yansıması", async ({ page }) => {
   await page.getByLabel("Fiyat (₺)").fill("345.67");
   await page.getByLabel("Kategori").selectOption({ label: "Hamburgerler" });
   await page.getByRole("button", { name: "Ürünü ekle" }).click();
-  await expect(page.getByText("Ürün eklendi.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("main").getByText("Ürün eklendi.", { exact: false })).toBeVisible();
 
   await page.goto(`/menu?q=${encodeURIComponent(name)}`);
   const publicProduct = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
@@ -101,7 +100,7 @@ test("admin ürün CRUD ve public yansıması", async ({ page }) => {
 test("tek kalıcı QR yönetim sayfası açılır", async ({ page }) => {
   await login(page);
   await page.goto("/admin/qr");
-  await expect(page.getByRole("heading", { name: "Tek QR kodunuz" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "QR Kodum" })).toBeVisible();
   await expect(page.getByText("/menu", { exact: false }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: /PNG indir/i })).toBeVisible();
 });
