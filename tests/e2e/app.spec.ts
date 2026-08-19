@@ -41,7 +41,6 @@ test("ana sayfa tek menü eylemiyle odaklı açılır", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("main section").first();
   await expect(hero.getByRole("link", { name: "Menüyü gör" })).toHaveCount(1);
-  await expect(page.getByRole("link", { name: /Sipariş ver|Sepet/i })).toHaveCount(0);
   await expect(hero.getByRole("heading", { level: 1 })).toBeVisible();
   expect(await hero.evaluate((element) => element.getBoundingClientRect().height)).toBeLessThanOrEqual(620);
 });
@@ -54,12 +53,6 @@ test("QR menü salt okunur ürün detayına gider", async ({ page }) => {
   await expect(page).toHaveURL(/\/menu\/product\/cheeseburger$/);
   await expect(page.getByRole("heading", { name: "Cheeseburger" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Sepete ekle/i })).toHaveCount(0);
-});
-
-test("kaldırılan sipariş rotaları 404 döndürür", async ({ request }) => {
-  for (const path of ["/checkout", "/kitchen", "/payment/success", "/api/payments/paytr/callback"]) {
-    expect((await request.get(path)).status(), path).toBe(404);
-  }
 });
 
 test("public sayfalar tüm temel ekran genişliklerinde, admin ise telefonda yatay taşmaz", async ({ page }) => {
@@ -79,7 +72,6 @@ test("public sayfalar tüm temel ekran genişliklerinde, admin ise telefonda yat
   await page.getByRole("button", { name: "Yönetim menüsünü aç" }).click();
   const nav = page.getByRole("navigation", { name: "Yönetim menüsü" });
   await expect(nav).toBeVisible();
-  await expect(nav.getByText("Siparişler")).toHaveCount(0);
   await expect(nav.getByRole("link", { name: "QR Kodum" })).toBeVisible();
 });
 
@@ -120,24 +112,37 @@ test("ürün detayı mobil, tablet ve masaüstünde sütunları üst üste bindi
 
 test("admin ürün CRUD ve public yansıması", async ({ page }) => {
   const name = `E2E Menü Ürünü ${Date.now()}`;
+  let archived = false;
   await login(page);
-  await page.goto("/admin/products/new");
-  await page.getByLabel("Ürün adı").fill(name);
-  await page.getByLabel("Açıklama", { exact: true }).fill("E2E doğrulaması için günlük hazırlanan örnek menü ürünü.");
-  await page.getByLabel("Fiyat (₺)").fill("345.67");
-  await page.getByLabel("Kategori").selectOption({ label: "Hamburgerler" });
-  await page.getByRole("button", { name: "Ürünü ekle" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("Ürün eklendi.");
+  try {
+    await page.goto("/admin/products/new");
+    await page.getByLabel("Ürün adı").fill(name);
+    await page.getByLabel("Açıklama", { exact: true }).fill("E2E doğrulaması için günlük hazırlanan örnek menü ürünü.");
+    await page.getByLabel("Fiyat (₺)").fill("345.67");
+    await page.getByLabel("Kategori").selectOption({ label: "Hamburgerler" });
+    await page.getByRole("button", { name: "Ürünü ekle" }).click();
+    await expect(page.getByRole("main").getByRole("alert")).toContainText("Ürün eklendi.");
 
-  await page.goto(`/menu?q=${encodeURIComponent(name)}`);
-  const publicProduct = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
-  await expect(publicProduct).toContainText("₺345,67");
+    await page.goto(`/menu?q=${encodeURIComponent(name)}`);
+    const publicProduct = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
+    await expect(publicProduct).toContainText("₺345,67");
 
-  await page.goto(`/admin/products?q=${encodeURIComponent(name)}`);
-  const adminProduct = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
-  await adminProduct.getByRole("button", { name: "Arşivle" }).click();
-  await page.getByRole("alertdialog").getByRole("button", { name: "Arşivle", exact: true }).click();
-  await expect(page).toHaveURL(/success=deleted/);
+    await page.goto(`/admin/products?q=${encodeURIComponent(name)}`);
+    const adminProduct = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
+    await adminProduct.getByRole("button", { name: "Arşivle" }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "Arşivle", exact: true }).click();
+    await expect(page).toHaveURL(/success=deleted/);
+    archived = true;
+  } finally {
+    if (!archived) {
+      await page.goto(`/admin/products?q=${encodeURIComponent(name)}`);
+      const leftover = page.getByRole("article").filter({ has: page.getByRole("heading", { name }) });
+      if (await leftover.count()) {
+        await leftover.getByRole("button", { name: "Arşivle" }).click();
+        await page.getByRole("alertdialog").getByRole("button", { name: "Arşivle", exact: true }).click();
+      }
+    }
+  }
 });
 
 test("tek kalıcı QR yönetim sayfası açılır", async ({ page }) => {

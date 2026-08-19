@@ -24,10 +24,6 @@ Restoran ve geliştirici hesapları aynı kullanıcı tablosunu, giriş sayfası
 - Ürün/kategori “silme” işlemleri audit kaydıyla arşivler.
 - QR yalnız canonical `APP_URL/menu` adresini kodlar; içerik değişse de yeniden basılmaz.
 
-## Kaldırılan alanlar
-
-Sipariş, checkout, PayTR, ödeme, masa, teslimat, ürün seçenekleri, mutfak, servis, kurye ve satış raporu modülleri güncel üründe yoktur. Rotaları, servisleri, testleri, environment alanları ve canlı Prisma modelleri kaldırılmıştır. Eski migration dosyaları değiştirilmez; bunlar eski kurulumu sıfırdan başlayarak son şemaya güvenle yükseltmek için gereklidir.
-
 ## Migration ve operasyon
 
 - Şema değişiklikleri yalnız ileri migration ile yapılır.

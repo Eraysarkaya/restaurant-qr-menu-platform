@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getPublicSettings } from "@/server/dal/public";
 
-export const alt = "Restoran menüsü ve çevrimiçi sipariş";
+export const alt = "Restoran web sitesi ve güncel menü";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
