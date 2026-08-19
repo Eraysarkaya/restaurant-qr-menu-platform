@@ -6,11 +6,9 @@ Tek restoran için ayrı Vercel projesi, PostgreSQL veritabanı, Cloudinary hesa
 
 ### Müşteri sitesi
 
-| Ana sayfa | Dijital menü |
+| Ana sayfa | Menü |
 | --- | --- |
-| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Kategoriye göre filtrelenmiş dijital menü](docs/screenshots/02-menu.png) |
-
-![Klasik Burger ürün detay sayfası](docs/screenshots/03-product.png)
+| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Kategoriye göre filtrelenmiş menü](docs/screenshots/02-menu-current.png) |
 
 ### İşletme yönetimi
 
