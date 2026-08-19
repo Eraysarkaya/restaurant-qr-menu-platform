@@ -1,0 +1,24 @@
+import Link from "next/link";
+import { ArrowRight, Clock3, Package, Plus, QrCode, Tags, TriangleAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRestaurantStatus } from "@/lib/opening-hours";
+import { getAdminDb } from "@/server/dal/admin";
+
+export default async function AdminDashboard() {
+  const db = await getAdminDb();
+  const [settings, productCount, categoryCount, unavailableCount] = await Promise.all([
+    db.restaurantSettings.findUniqueOrThrow({ where: { id: "singleton" }, include: { openingHours: { orderBy: { dayOfWeek: "asc" } } } }),
+    db.product.count({ where: { archivedAt: null } }), db.category.count({ where: { archivedAt: null } }), db.product.count({ where: { archivedAt: null, isAvailable: false } }),
+  ]);
+  const status = getRestaurantStatus(settings.openingHours, settings.timezone);
+  return <div className="space-y-6"><header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-xs font-extrabold uppercase tracking-[.18em] text-primary">Genel Bakış</p><h1 className="mt-1.5 text-3xl font-extrabold tracking-[-.035em] sm:text-4xl">{settings.name}</h1><p className="mt-2 text-sm text-muted-foreground">Menünüzü ve işletme bilgilerinizi tek yerden güncelleyin.</p></div><Button asChild><Link href="/admin/products/new"><Plus />Ürün ekle</Link></Button></header>
+    <section aria-labelledby="menu-summary-title" className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr]"><Card className="bg-white"><CardHeader className="border-b pb-4"><CardTitle id="menu-summary-title" className="flex items-center gap-2 font-bold"><Package className="size-5 text-primary" />Menünüz</CardTitle></CardHeader><CardContent className="grid grid-cols-3 gap-3 pt-1"><Metric value={productCount} label="ürün" /><Metric value={categoryCount} label="kategori" /><Metric value={unavailableCount} label="tükendi" warning={unavailableCount > 0} /><Button asChild variant="outline" className="col-span-3 mt-2"><Link href="/admin/products">Ürünleri yönet <ArrowRight /></Link></Button></CardContent></Card>
+      <Card className="bg-white"><CardHeader className="border-b pb-4"><CardTitle className="flex items-center gap-2 font-bold"><QrCode className="size-5 text-primary" />QR Menünüz</CardTitle></CardHeader><CardContent className="pt-1"><p className="text-sm leading-6 text-muted-foreground">Tek QR kodunuz her zaman güncel menüyü açar.</p><Button asChild variant="outline" className="mt-5 w-full"><Link href="/admin/qr">QR kodunu gör</Link></Button></CardContent></Card>
+      <Card className="bg-white"><CardHeader className="border-b pb-4"><CardTitle className="flex items-center gap-2 font-bold"><Clock3 className="size-5 text-primary" />İşletme</CardTitle></CardHeader><CardContent className="pt-1"><p className={`text-sm font-bold ${status.isOpen ? "text-emerald-700" : "text-amber-700"}`}>{status.label}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Saatler ve iletişim bilgileri müşterilere otomatik yansır.</p><Button asChild variant="outline" className="mt-5 w-full"><Link href="/admin/opening-hours">Saatleri düzenle</Link></Button></CardContent></Card></section>
+    <section aria-labelledby="quick-actions-title"><h2 id="quick-actions-title" className="text-lg font-extrabold">Hızlı işlemler</h2><div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><QuickLink href="/admin/products" icon={Package} title="Fiyat veya ürün değiştir" description="Ürünleri düzenleyin, tükendi veya satışta yapın." /><QuickLink href="/admin/categories" icon={Tags} title="Kategorileri düzenle" description="Kategori ekleyin, gizleyin veya sırasını değiştirin." /><QuickLink href="/admin/settings" icon={TriangleAlert} title="İşletme bilgilerini kontrol et" description="Adres, telefon ve site metinlerini güncelleyin." /></div></section>
+  </div>;
+}
+
+function Metric({ value, label, warning = false }: { value: number; label: string; warning?: boolean }) { return <div className={`rounded-xl border p-3 text-center ${warning ? "border-amber-200 bg-amber-50" : "bg-muted/45"}`}><strong className="block text-2xl tracking-tight">{value}</strong><span className="mt-1 block text-xs font-semibold text-muted-foreground">{label}</span></div>; }
+function QuickLink({ href, icon: Icon, title, description }: { href: string; icon: typeof Package; title: string; description: string }) { return <Link href={href} className="group flex min-h-28 gap-3 rounded-xl border bg-white p-4 shadow-sm transition hover:border-primary/25 hover:shadow-md"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/9 text-primary"><Icon className="size-5" /></span><span><strong className="block">{title}</strong><span className="mt-1 block text-sm leading-5 text-muted-foreground">{description}</span></span></Link>; }

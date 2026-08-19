@@ -1,0 +1,379 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  OWNER
+  EDITOR
+}
+
+enum FeaturePreset {
+  QR_MENU_ONLY
+  RESTAURANT_WEBSITE
+  PREMIUM_WEBSITE
+}
+
+enum InstanceStatus {
+  DRAFT
+  SETUP
+  ACTIVE
+  MAINTENANCE
+  ERROR
+  ARCHIVED
+}
+
+enum DeploymentProvider {
+  VERCEL
+  OTHER
+}
+
+enum PlatformRole {
+  DEVELOPER
+}
+
+enum BusinessType {
+  CAFE
+  LOKANTA
+  QUICK_SERVICE
+  RESTAURANT
+}
+
+enum PublicThemePreset {
+  WARM
+  MODERN
+  CLASSIC
+}
+
+enum PublicFontPreset {
+  MANROPE
+  LORA
+}
+
+model User {
+  id                 String     @id @default(cuid())
+  name               String
+  email              String     @unique
+  emailVerified      Boolean    @default(false)
+  image              String?
+  role               UserRole   @default(OWNER)
+  isActive           Boolean    @default(true)
+  mustChangePassword Boolean    @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  auditLogs          AuditLog[]
+
+  @@index([role, isActive])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model RestaurantSettings {
+  id                   String            @id @default("singleton")
+  name                 String
+  shortDescription     String
+  longDescription      String
+  heroTitle            String
+  heroSubtitle         String
+  logoUrl              String?
+  logoPublicId         String?
+  faviconUrl           String?
+  faviconPublicId      String?
+  heroImageUrl         String?
+  heroImagePublicId    String?
+  phone                String?
+  whatsapp             String?
+  email                String?
+  address              String?
+  googleMapsUrl        String?
+  mapEmbedUrl          String?
+  instagramUrl         String?
+  facebookUrl          String?
+  tiktokUrl            String?
+  youtubeUrl           String?
+  xUrl                 String?
+  showPhoneCta         Boolean           @default(true)
+  showWhatsappCta      Boolean           @default(true)
+  showDirectionsCta    Boolean           @default(true)
+  primaryColor         String            @default("#B4532A")
+  accentColor          String            @default("#66704A")
+  currency             String            @default("TRY")
+  locale               String            @default("tr-TR")
+  timezone             String            @default("Europe/Istanbul")
+  businessType         BusinessType      @default(LOKANTA)
+  largeTextMode        Boolean           @default(false)
+  themePreset          PublicThemePreset @default(WARM)
+  fontPreset           PublicFontPreset  @default(LORA)
+  heroFocalX           Int               @default(50)
+  heroFocalY           Int               @default(50)
+  featurePreset        FeaturePreset     @default(RESTAURANT_WEBSITE)
+  showHomePage         Boolean           @default(true)
+  showAboutPage        Boolean           @default(true)
+  showContactPage      Boolean           @default(true)
+  showHero             Boolean           @default(true)
+  showFeaturedProducts Boolean           @default(true)
+  showMap              Boolean           @default(true)
+  showSocialLinks      Boolean           @default(true)
+  ownerCanEditBranding Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  openingHours         OpeningHour[]
+}
+
+model OpeningHour {
+  id         String             @id @default(cuid())
+  settingsId String
+  dayOfWeek  Int
+  isClosed   Boolean            @default(false)
+  openTime   String?
+  closeTime  String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  settings   RestaurantSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@unique([settingsId, dayOfWeek])
+  @@index([settingsId, dayOfWeek])
+}
+
+model Category {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  imageUrl      String?
+  imagePublicId String?
+  sortOrder     Int       @default(0)
+  isActive      Boolean   @default(true)
+  archivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  products      Product[]
+
+  @@index([isActive, archivedAt, sortOrder])
+  @@index([updatedAt])
+}
+
+model Product {
+  id               String    @id @default(cuid())
+  name             String
+  slug             String    @unique
+  description      String
+  shortDescription String?
+  price            Decimal   @db.Decimal(10, 2)
+  oldPrice         Decimal?  @db.Decimal(10, 2)
+  badge            String?
+  imageUrl         String?
+  imagePublicId    String?
+  categoryId       String
+  isActive         Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  isAvailable      Boolean   @default(true)
+  sortOrder        Int       @default(0)
+  archivedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  category         Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId, isActive, archivedAt, sortOrder])
+  @@index([isActive, isFeatured, archivedAt, sortOrder])
+  @@index([updatedAt])
+}
+
+model PlatformUser {
+  id              String             @id @default(cuid())
+  name            String
+  email           String             @unique
+  passwordHash    String
+  role            PlatformRole       @default(DEVELOPER)
+  isActive        Boolean            @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  sessions        PlatformSession[]
+  auditLogs       PlatformAuditLog[]
+  invitations     OwnerInvitation[]
+  supportSessions SupportSession[]
+
+  @@index([isActive])
+}
+
+model PlatformSession {
+  id        String       @id @default(cuid())
+  tokenHash String       @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  userId    String
+  user      PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model RestaurantInstance {
+  id                   String              @id @default(cuid())
+  name                 String
+  slug                 String              @unique
+  domain               String?             @unique
+  status               InstanceStatus      @default(DRAFT)
+  templatePreset       PublicThemePreset   @default(WARM)
+  fontPreset           PublicFontPreset    @default(LORA)
+  featurePreset        FeaturePreset       @default(RESTAURANT_WEBSITE)
+  deploymentProvider   DeploymentProvider?
+  deploymentProjectId  String?
+  managementEndpoint   String?
+  primaryContactName   String?
+  primaryContactEmail  String?
+  logoUrl              String?
+  logoPublicId         String?
+  heroImageUrl         String?
+  heroImagePublicId    String?
+  heroFocalX           Int                 @default(50)
+  heroFocalY           Int                 @default(50)
+  primaryColor         String              @default("#B4532A")
+  accentColor          String              @default("#66704A")
+  ownerCanEditBranding Boolean             @default(false)
+  showHomePage         Boolean             @default(true)
+  showAboutPage        Boolean             @default(true)
+  showContactPage      Boolean             @default(true)
+  showHero             Boolean             @default(true)
+  showFeaturedProducts Boolean             @default(true)
+  showMap              Boolean             @default(true)
+  showSocialLinks      Boolean             @default(true)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  auditLogs            PlatformAuditLog[]
+  invitations          OwnerInvitation[]
+  supportSessions      SupportSession[]
+
+  @@index([status, updatedAt])
+  @@index([featurePreset, status])
+}
+
+model PlatformAuditLog {
+  id         String              @id @default(cuid())
+  actorId    String?
+  instanceId String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime            @default(now())
+  actor      PlatformUser?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  instance   RestaurantInstance? @relation(fields: [instanceId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([instanceId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model OwnerInvitation {
+  id          String             @id @default(cuid())
+  instanceId  String
+  createdById String?
+  email       String
+  tokenHash   String             @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime           @default(now())
+  instance    RestaurantInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  createdBy   PlatformUser?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([instanceId, expiresAt])
+  @@index([email, expiresAt])
+}
+
+model SupportSession {
+  id             String             @id @default(cuid())
+  instanceId     String
+  platformUserId String
+  tokenHash      String             @unique
+  scope          String
+  expiresAt      DateTime
+  usedAt         DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime           @default(now())
+  instance       RestaurantInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  platformUser   PlatformUser       @relation(fields: [platformUserId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId, expiresAt])
+  @@index([platformUserId, expiresAt])
+}
