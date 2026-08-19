@@ -26,6 +26,7 @@
 # misc
 .DS_Store
 *.pem
+/.tools/
 
 # debug
 *.log
@@ -47,3 +48,6 @@ next-env.d.ts
 
 # generated Prisma client (recreated by postinstall)
 /src/generated/prisma/
+
+# local planning brief (not runtime source)
+/RESTORAN - KAFE WEB SİTESİ — TAM YIĞIN ÜRETİM ODAKLI PROJE.md

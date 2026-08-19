@@ -4,21 +4,19 @@ Tek restoran için ayrı Vercel projesi, PostgreSQL veritabanı, Cloudinary hesa
 
 ## Ekran görüntüleri
 
-### Ana sayfa
+### Müşteri sitesi
 
-![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png)
-
-### Dijital menü
-
-![Kategori ve ürün kartlarıyla dijital menü](docs/screenshots/02-menu.png)
-
-### Ürün detayı
+| Ana sayfa | Dijital menü |
+| --- | --- |
+| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Kategoriye göre filtrelenmiş dijital menü](docs/screenshots/02-menu.png) |
 
 ![Klasik Burger ürün detay sayfası](docs/screenshots/03-product.png)
 
-### Yönetici girişi
+### İşletme yönetimi
 
-![Restoran yönetim paneli giriş ekranı](docs/screenshots/04-admin-login.png)
+| Genel bakış | Ürünler |
+| --- | --- |
+| ![Restoran yönetim paneli genel bakış ekranı](docs/screenshots/04-admin-dashboard.png) | ![Fiyat, mevcudiyet ve ürün işlemlerinin yönetildiği Ürünler ekranı](docs/screenshots/05-admin-products.png) |
 
 ## Ürün kapsamı
 
@@ -34,6 +32,22 @@ Checkout, PayTR, masa siparişi, mutfak ekranı, servis, kurye ve satış raporu
 ## Teknoloji
 
 Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS, PostgreSQL, Prisma 7, Better Auth, Cloudinary, Zod, Vitest ve Playwright.
+
+## Proje düzeni
+
+```text
+src/app/          Sayfalar, layout'lar ve Route Handler'lar
+src/components/   Public, admin, platform ve ortak UI bileşenleri
+src/features/     İş kurallarını çalıştıran Server Action'lar
+src/server/       Veritabanı, auth, güvenlik, medya ve DAL
+src/platform/     Geliştirici paneli servisleri
+src/validations/  Paylaşılan Zod sözleşmeleri
+prisma/           Şema, ileri migration'lar, seed ve bakım komutu
+tests/            Unit, integration ve E2E testleri
+docs/             Mimari notlar ve güncel ekran görüntüleri
+```
+
+Derleme çıktıları, yerel veritabanı araçları, test raporları, loglar, environment dosyaları ve üretilen Prisma istemcisi Git'e dahil edilmez.
 
 ## Yerel kurulum
 
@@ -97,6 +111,12 @@ npm run test:e2e
 ```
 
 Her teslimde gerçek domain/HTTPS, Cloudinary yükleme, QR baskı ve yönlendirme, 375 px mobil görünüm, klavye/focus, yedek alma ve geri yükleme ayrıca doğrulanmalıdır.
+
+## Ayrıntılı dokümantasyon
+
+- [Ürün mimarisi](docs/PRODUCT_ARCHITECTURE.md)
+- [Environment örneği](.env.example)
+- [Veritabanı şeması](prisma/schema.prisma)
 
 ## Lisans
 

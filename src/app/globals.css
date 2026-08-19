@@ -191,6 +191,9 @@
 }
 
 .public-site {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
   font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.6;
