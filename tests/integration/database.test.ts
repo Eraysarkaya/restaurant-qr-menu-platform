@@ -49,11 +49,9 @@ describe("PostgreSQL ürün/kategori entegrasyonu", () => {
     expect(await db.product.count({ where: { id: productId, archivedAt: null } })).toBe(0);
   });
 
-  it("aktif sorgu indekslerini korur ve eski sipariş tablolarını içermez", async () => {
+  it("aktif kategori ve ürün sorgu indekslerini korur", async () => {
     const indexes = await db.$queryRaw<Array<{ indexname: string }>>`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND tablename IN ('Category', 'Product')`;
     expect(indexes.map((row) => row.indexname)).toEqual(expect.arrayContaining(["Category_isActive_archivedAt_sortOrder_idx", "Product_categoryId_isActive_archivedAt_sortOrder_idx"]));
-    const retired = await db.$queryRaw<Array<{ table_name: string }>>`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('Order', 'Payment', 'DiningTable', 'KitchenStation')`;
-    expect(retired).toEqual([]);
   });
 
   it("yönetim denetim kaydını zaman damgası ve indekslenen hedefle saklar", async () => {

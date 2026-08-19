@@ -8,13 +8,19 @@ Tek restoran için ayrı Vercel projesi, PostgreSQL veritabanı, Cloudinary hesa
 
 | Ana sayfa | Menü |
 | --- | --- |
-| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Kategoriye göre filtrelenmiş menü](docs/screenshots/02-menu-current.png) |
+| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Hamburger kategorisine göre filtrelenmiş menü](docs/screenshots/02-menu-hamburgers.png) |
 
 ### İşletme yönetimi
 
 | Genel bakış | Ürünler |
 | --- | --- |
 | ![Restoran yönetim paneli genel bakış ekranı](docs/screenshots/04-admin-dashboard.png) | ![Fiyat, mevcudiyet ve ürün işlemlerinin yönetildiği Ürünler ekranı](docs/screenshots/05-admin-products.png) |
+
+### Geliştirici paneli
+
+| Restoran kurulumları | Köşe Mutfak özelleştirmesi |
+| --- | --- |
+| ![Geliştirici panelindeki restoran kurulumları](docs/screenshots/06-platform-dashboard.png) | ![Köşe Mutfak şablon ve marka düzenleme ekranı](docs/screenshots/07-platform-instance.png) |
 
 ## Ürün kapsamı
 
@@ -24,8 +30,6 @@ Tek restoran için ayrı Vercel projesi, PostgreSQL veritabanı, Cloudinary hesa
 - `OWNER` ve içerik odaklı `EDITOR` rolleri
 - Restoran girişinden tamamen ayrı `/platform` geliştirici alanı
 - Sıcak, modern ve klasik site şablonları; Manrope/Lora yazı stili; renk, logo, kapak, odak ve canlı önizleme
-
-Checkout, PayTR, masa siparişi, mutfak ekranı, servis, kurye ve satış raporu bu ürünün parçası değildir; ilgili kaynak kod, rota, ortam sözleşmesi ve güncel veritabanı tabloları kaldırılmıştır.
 
 ## Teknoloji
 
