@@ -1,110 +1,68 @@
 # Restaurant QR Menu Platform
 
-Restoranlara müşteri sitesi, kalıcı QR menü ve içerik yönetim paneli sağlayan açık kaynaklı bir full-stack uygulama. Her restoran kendi deployment, PostgreSQL veritabanı, medya hesabı ve domain'iyle kurulabilir; “Köşe Mutfak” örnek içeriktir.
+Restoranlar için web sitesi, kalıcı QR menü ve yönetim panelleri sunan açık kaynaklı bir Next.js uygulaması. **Köşe Mutfak** projedeki örnek restorandır; menü, marka ve site içeriği yönetim ekranlarından değiştirilebilir.
 
-**Teknik odak:** işletme ve geliştirici rollerinin ayrılması, güvenli sunucu işlemleri, ileri veritabanı migration'ları ve tekrarlanabilir kurulum.
+Uygulama üç alandan oluşur:
+
+| Alan | Ne işe yarar? |
+| --- | --- |
+| Müşteri sitesi | Restoranı, çalışma saatlerini, kategorileri ve güncel menüyü gösterir. |
+| İşletme paneli | Ürünleri, fiyatları, mevcudiyeti ve site içeriğini yönetir. |
+| Geliştirici paneli | Restoran kurulumunun temasını, marka ayarlarını ve görünür bölümlerini düzenler. |
+
+QR kodu sabit `/menu` adresine yönlenir; menü değiştiğinde kodun yeniden basılması gerekmez. İşletme ve geliştirici hesaplarının girişleri ve yetkileri ayrıdır.
 
 ## Ekran görüntüleri
 
-### Müşteri sitesi
-
-| Ana sayfa | Menü |
+| Müşteri sitesi | Menü |
 | --- | --- |
-| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Hamburger kategorisine göre filtrelenmiş menü](docs/screenshots/02-menu-hamburgers.png) |
+| ![Köşe Mutfak ana sayfası](docs/screenshots/01-home.png) | ![Kategoriye göre filtrelenmiş menü](docs/screenshots/02-menu-hamburgers.png) |
 
-### İşletme yönetimi
-
-| Genel bakış | Ürünler |
+| İşletme paneli | Ürün yönetimi |
 | --- | --- |
-| ![Restoran yönetim paneli genel bakış ekranı](docs/screenshots/04-admin-dashboard.png) | ![Fiyat, mevcudiyet ve ürün işlemlerinin yönetildiği Ürünler ekranı](docs/screenshots/05-admin-products.png) |
+| ![İşletme paneli](docs/screenshots/04-admin-dashboard.png) | ![Ürün yönetimi](docs/screenshots/05-admin-products.png) |
 
-### Geliştirici paneli
-
-| Restoran kurulumları | Köşe Mutfak özelleştirmesi |
+| Geliştirici paneli | Marka ayarları |
 | --- | --- |
-| ![Geliştirici panelindeki restoran kurulumları](docs/screenshots/06-platform-dashboard.png) | ![Köşe Mutfak şablon ve marka düzenleme ekranı](docs/screenshots/07-platform-instance.png) |
+| ![Restoran kurulumları](docs/screenshots/06-platform-dashboard.png) | ![Restoran görünüm ayarları](docs/screenshots/07-platform-instance.png) |
 
-## Ürün kapsamı
+## Özellikler
 
-- Public ana sayfa, menü, ürün detayı, hakkımızda ve iletişim sayfaları
-- Değişmeyen `/menu` hedefli PNG/SVG QR kodu
-- Kategori, ürün, mevcudiyet, çalışma saati, işletme içeriği ve profil yönetimi
-- `OWNER` ve içerik odaklı `EDITOR` rolleri
-- Restoran girişinden tamamen ayrı `/platform` geliştirici alanı
-- Sıcak, modern ve klasik site şablonları; Manrope/Lora yazı stili; renk, logo, kapak, odak ve canlı önizleme
+- Kategorili menü, ürün sayfaları, çalışma saatleri ve iletişim sayfaları
+- Ürün, fiyat, mevcudiyet ve işletme içeriği yönetimi
+- İşletme için `OWNER` ve `EDITOR` rolleri
+- Tema, renk, font, logo ve kapak görseli ayarları
+- PNG/SVG olarak indirilebilen kalıcı QR kodu
+- Sunucu tarafında doğrulama ve yetki kontrolleri
 
-## Teknoloji
+Her restoran ayrı uygulama kurulumu ve veritabanıyla çalışacak şekilde tasarlanmıştır. Geliştirici panelindeki yerel örnek kurulumu özelleştirmek mevcut uygulamada çalışır; farklı kurulumlara uzaktan otomatik dağıtım bu repository’de tamamlanmış bir özellik değildir.
 
-Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS, PostgreSQL, Prisma 7, Better Auth, Cloudinary, Zod, Vitest ve Playwright.
+## Teknolojiler
 
-## Proje düzeni
-
-```text
-src/app/          Sayfalar, layout'lar ve Route Handler'lar
-src/components/   Public, admin, platform ve ortak UI bileşenleri
-src/features/     İş kurallarını çalıştıran Server Action'lar
-src/server/       Veritabanı, auth, güvenlik, medya ve DAL
-src/platform/     Geliştirici paneli servisleri
-src/validations/  Paylaşılan Zod sözleşmeleri
-prisma/           Şema, ileri migration'lar, seed ve bakım komutu
-tests/            Unit, integration ve E2E testleri
-docs/             Mimari notlar ve güncel ekran görüntüleri
-```
-
-Derleme çıktıları, yerel veritabanı araçları, test raporları, loglar, environment dosyaları ve üretilen Prisma istemcisi Git'e dahil edilmez.
+Next.js 16 · React 19 · TypeScript · Tailwind CSS · PostgreSQL · Prisma 7 · Better Auth · Cloudinary · Zod · Vitest · Playwright
 
 ## Yerel kurulum
 
+Node.js, npm ve PostgreSQL gerekir. Önce [`.env.example`](.env.example) dosyasını `.env` olarak kopyalayın; veritabanı bağlantısını, oturum anahtarlarını ve ilk kullanıcı bilgilerini kendi ortamınıza göre düzenleyin. Görsel yüklemek için Cloudinary değişkenlerini de doldurun.
+
 ```bash
 npm install
-copy .env.example .env
+cp .env.example .env
 npm run db:dev
 npm run db:deploy
 npm run db:seed
 npm run dev
 ```
 
-- Müşteri sitesi: `http://localhost:3000`
-- İşletme paneli: `http://localhost:3000/admin/login`
-- Geliştirici paneli: `http://localhost:3000/platform/login`
+Windows Komut İstemi'nde `cp` yerine `copy` kullanın. Proje yerel PostgreSQL sunucunuzla çalışıyorsa `npm run db:dev` adımı gerekli değildir; `DATABASE_URL` değerini mevcut sunucunuza yönlendirin.
 
-Bootstrap parolaları yalnız ilk seed için kullanılmalı ve production kurulumundan sonra environment’tan kaldırılmalıdır.
+- Müşteri sitesi: [localhost:3000](http://localhost:3000)
+- İşletme girişi: [localhost:3000/admin/login](http://localhost:3000/admin/login)
+- Geliştirici girişi: [localhost:3000/platform/login](http://localhost:3000/platform/login)
 
-## Geliştirici özelleştirmesi
+İlk giriş hesapları `.env` dosyasındaki bootstrap bilgileriyle seed sırasında oluşturulur. Gerçek kurulumda güçlü parolalar kullanın ve bootstrap parola değişkenlerini seed sonrasında kaldırın.
 
-`/platform/instances/[id]` ekranında şablon, font, marka renkleri, logo, hazır/kendi kapak görseli, dokuz noktalı görsel odağı, paket ve görünür sayfalar seçilir. Seed’in oluşturduğu `deploymentProjectId=local` kaydı kaydedildiğinde seçimler aynı transaction içinde `RestaurantSettings` kaydına aktarılır; public cache yenilenir ve müşteri sitesi anında değişir.
-
-Diğer müşteri kurulumları ayrı deployment ve veritabanı kullanır. Merkezi platformda secret veya müşteri verisi tutulmaz; uzaktaki deployment’a otomatik yayın için ileride imzalı bir yönetim endpoint’i kullanılmalıdır.
-
-## Veritabanı ilkeleri
-
-- Menü fiyatları `DECIMAL(10,2)`; kategori ilişkisi `RESTRICT`.
-- Silme kullanıcı arayüzünde arşivleme şeklindedir; yanlış işlemler geri kazanılabilir.
-- Slug’lar tekildir; public liste sorguları aktiflik, arşiv ve sıra bileşik indekslerini kullanır.
-- Her mutation sunucuda tekrar Zod, session ve permission kontrolünden geçer.
-- Migration geçmişi değiştirilmez; kaldırılan özellikler yeni bir ileri migration ile temizlenmiştir.
-
-Production öncesinde:
-
-```bash
-pg_dump --format=custom --no-owner --file=restaurant-before-migration.dump "$DATABASE_URL"
-npm run db:deploy
-npm run db:seed
-```
-
-## Güvenlik
-
-- Public kayıt kapalı; HTTP-only, secure-production ve same-site session cookie’leri
-- Admin/platform için `private, no-store`; platform ve owner sayfalarında `noindex`
-- Platform ve restoran kullanıcı/session tabloları ayrı
-- Server Action ve Route Handler seviyesinde tekrar yetkilendirme
-- Görsel MIME + dosya imzası kontrolü, 4 MB sınırı, server-side Cloudinary secret
-- CSP, HSTS-production, `nosniff`, frame engeli, referrer ve permissions policy
-- Giriş hız sınırı, hash’li platform tokenları ve sanitize audit kayıtları
-
-`npm audit --omit=dev` şu anda Prisma’nın dolaylı `deepmerge-ts` bağımlılığı için upstream “no fix available” uyarısı vermektedir. Uygulama kullanıcı girdisini bu yapılandırma birleştiricisine iletmez; yine de Prisma yayınları düzenli izlenip düzeltme çıktığında güncellenmelidir.
-
-## Kalite kapıları
+## Kontroller
 
 ```bash
 npm run typecheck
@@ -114,14 +72,8 @@ npm run build
 npm run test:e2e
 ```
 
-Her teslimde gerçek domain/HTTPS, Cloudinary yükleme, QR baskı ve yönlendirme, 375 px mobil görünüm, klavye/focus, yedek alma ve geri yükleme ayrıca doğrulanmalıdır.
-
-## Ayrıntılı dokümantasyon
-
-- [Ürün mimarisi](docs/PRODUCT_ARCHITECTURE.md)
-- [Environment örneği](.env.example)
-- [Veritabanı şeması](prisma/schema.prisma)
+Veri modeli ve panellerin ilişkisi için [ürün mimarisi](docs/PRODUCT_ARCHITECTURE.md), yapılandırma için [ortam değişkenleri](.env.example) ve [Prisma şeması](prisma/schema.prisma) incelenebilir.
 
 ## Lisans
 
-Bu proje [MIT Lisansı](LICENSE) ile yayımlanmıştır.
+[MIT](LICENSE).
