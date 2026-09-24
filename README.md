@@ -1,6 +1,8 @@
-# Restoran Web Sitesi + Kalıcı QR Menü
+# Restaurant QR Menu Platform
 
-Tek restoran için ayrı Vercel projesi, PostgreSQL veritabanı, Cloudinary hesabı ve domain ile kurulabilen yönetilebilir web sitesi şablonudur. “Köşe Mutfak” yalnız demo içeriğidir.
+Restoranlara müşteri sitesi, kalıcı QR menü ve içerik yönetim paneli sağlayan açık kaynaklı bir full-stack uygulama. Her restoran kendi deployment, PostgreSQL veritabanı, medya hesabı ve domain'iyle kurulabilir; “Köşe Mutfak” örnek içeriktir.
+
+**Teknik odak:** işletme ve geliştirici rollerinin ayrılması, güvenli sunucu işlemleri, ileri veritabanı migration'ları ve tekrarlanabilir kurulum.
 
 ## Ekran görüntüleri
 
