@@ -1,6 +1,8 @@
 # Restaurant QR Menu Platform
 
-Restoranların müşterilerine güncel menülerini gösterebildiği, tek bir QR kodu kullanabildiği ve ürünlerini kendi panelinden yönetebildiği web platformu. İşletme menü veya fiyat değiştirdiğinde müşterinin gördüğü sayfa güncellenir; basılı QR kodunun değişmesi gerekmez. **Köşe Mutfak**, projedeki örnek restorandır.
+Restoranın güncel menüsünü tek QR koduyla müşteriye sunan ve içerik yönetimini işletmeye bırakan web platformu.
+
+Restoranlar için web sitesi, kalıcı QR menü ve yönetim panelleri sunan açık kaynaklı bir Next.js uygulaması. **Köşe Mutfak** projedeki örnek restorandır; menü, marka ve site içeriği yönetim ekranlarından değiştirilebilir.
 
 Uygulama üç alandan oluşur:
 
