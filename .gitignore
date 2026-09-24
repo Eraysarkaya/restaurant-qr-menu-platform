@@ -48,3 +48,6 @@ next-env.d.ts
 
 # generated Prisma client (recreated by postinstall)
 /src/generated/prisma/
+
+# generated local agent instructions
+/AGENTS.md
